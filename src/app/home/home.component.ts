@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
+import Swal from 'sweetalert2'
+
 
 @Component({
   selector: 'app-home',
@@ -10,15 +12,25 @@ export class HomeComponent implements OnInit {
   email: string = '';
   password: string = '';
   isLoggedIn!: boolean;
+  
   constructor(private authService: AuthService, private router: Router) { }
 
   ngOnInit(): void {
-    this.isLoggedIn = this.authService.isAuthenticated();
+    this.authService.isAuthenticated()
+    .subscribe({
+      next: (resp) => {
+        if (resp) {
+          this.isLoggedIn=true;
+        }
+        else {
+          this.isLoggedIn=false;
+        }
+      }
+    })
     
   }
 
   signIn():void{
-      console.log('Email: ', this.email, 'Password: ', this.password)
       this.authService.login(this.email,this.password)
       .subscribe({
         next: (resp) => {
@@ -29,7 +41,7 @@ export class HomeComponent implements OnInit {
           else {
             this.email=''; 
             this.password='';
-            confirm('Email o contraseña incorrectos');
+            Swal.fire('Email o contraseña incorrectos');
           }
         }
       })
@@ -40,6 +52,7 @@ export class HomeComponent implements OnInit {
     this.authService.logout();
     this.isLoggedIn=false;
   }
-    
+  
+
   
 }
